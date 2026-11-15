@@ -1,4 +1,6 @@
 HTML
+
+
 <!DOCTYPE html>
 <html lang="uz">
 <head>
@@ -217,13 +219,12 @@ HTML
                 p1.color = p1Selection.color;
                 selectingPlayer = 2;
                 if (gameMode === 'bot') {
-                    // Bot tasodifiy tanlaydi
                     let botIndex = Math.floor(Math.random() * characters.length);
                     p2Selection = characters[botIndex];
                     p2.color = p2Selection.color;
                     startGame();
                 } else {
-                    document.getElementById('char-titleinnerText') = "2-O'yinchi: Qahramon Tanlang";
+                    document.getElementById('char-title').innerText = "2-O'yinchi: Qahramon Tanlang";
                 }
             } else {
                 p2Selection = characters[index];
@@ -250,7 +251,6 @@ HTML
         function update() {
             if (gameState !== 'PLAYING') return;
 
-            // 1-O'yinchi boshqaruvi (W, A, D)
             if (keys['KeyA']) p1.vx = -5;
             else if (keys['KeyD']) p1.vx = 5;
             else p1.vx = 0;
@@ -260,7 +260,6 @@ HTML
                 p1.grounded = false;
             }
 
-            // 2-O'yinchi yoki Bot boshqaruvi
             if (gameMode === '2p') {
                 if (keys['ArrowLeft']) p2.vx = -5;
                 else if (keys['ArrowRight']) p2.vx = 5;
@@ -271,7 +270,6 @@ HTML
                     p2.grounded = false;
                 }
             } else {
-                // Oddiy Bot mantiqi
                 if (ball.x > p2.x + 20) p2.vx = 3.5;
                 else if (ball.x < p2.x - 20) p2.vx = -3.5;
                 else p2.vx = 0;
@@ -282,34 +280,28 @@ HTML
                 }
             }
 
-            // Gravitatsiya va fizika
             p1.vy += 0.5;
             p2.vy += 0.5;
 
             p1.x += p1.vx; p1.y += p1.vy;
             p2.x += p2.vx; p2.y += p2.vy;
 
-            // Yer bilan to'qnashuv
             if (p1.y > 320) { p1.y = 320; p1.vy = 0; p1.grounded = true; }
             if (p2.y > 320) { p2.y = 320; p2.vy = 0; p2.grounded = true; }
 
-            // Chegaralar
             if (p1.x < 20) p1.x = 20;
             if (p1.x > 360) p1.x = 360;
             if (p2.x < 400) p2.x = 400;
             if (p2.x > 740) p2.x = 740;
 
-            // To'p fizikasi
             ball.vy += 0.35;
             ball.x += ball.vx;
             ball.y += ball.vy;
 
-            // To'p devorlar bilan
             if (ball.y > 390) { ball.y = 390; ball.vy *= -0.75; ball.vx *= 0.95; }
             if (ball.x < 15) { ball.x = 15; ball.vx *= -0.8; }
             if (ball.x > 785) { ball.x = 785; ball.vx *= -0.8; }
 
-            // Gol urilishini tekshirish
             if (ball.y > 250 && ball.x < 50) {
                 document.getElementById('score-2').innerText = ++p2.score;
                 resetPositions();
@@ -318,7 +310,6 @@ HTML
                 resetPositions();
             }
 
-            // O'yinchi va To'p to'qnashuvi
             checkPlayerBallCollision(p1);
             checkPlayerBallCollision(p2);
         }
@@ -336,27 +327,22 @@ HTML
         function draw() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            // Maydon chiziqlari va darvozalar
             ctx.strokeStyle = '#334155';
             ctx.lineWidth = 4;
-            ctx.strokeRect(20, 200, 60, 200); // Chap darvoza
-            ctx.strokeRect(720, 200, 60, 200); // O'ng darvoza
+            ctx.strokeRect(20, 200, 60, 200);
+            ctx.strokeRect(720, 200, 60, 200);
 
-            // Markaziy chiziq
             ctx.beginPath();
             ctx.moveTo(canvas.width / 2, 0);
             ctx.lineTo(canvas.width / 2, canvas.height);
             ctx.stroke();
 
-            // 1-O'yinchi
             ctx.fillStyle = p1.color;
             ctx.fillRect(p1.x, p1.y, p1.width, p1.height);
 
-            // 2-O'yinchi
             ctx.fillStyle = p2.color;
             ctx.fillRect(p2.x, p2.y, p2.width, p2.height);
 
-            // To'p
             ctx.fillStyle = '#ffffff';
             ctx.beginPath();
             ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
