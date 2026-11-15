@@ -5,7 +5,7 @@ HTML
 <html lang="uz">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Ninja Soccer 2026 - Ultimate Edition</title>
     <style>
         * {
@@ -14,6 +14,7 @@ HTML
             padding: 0;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             user-select: none;
+            -webkit-user-select: none;
         }
         body {
             background-color: #020617;
@@ -27,16 +28,20 @@ HTML
         }
         #game-container {
             position: relative;
-            width: 800px;
-            height: 450px;
-            box-shadow: 0 0 25px rgba(59, 130, 246, 0.5);
-            border-radius: 12px;
+            width: 100%;
+            max-width: 900px;
+            aspect-ratio: 16 / 9;
+            box-shadow: 0 0 40px rgba(56, 189, 248, 0.4);
+            border: 2px solid #1e293b;
+            border-radius: 14px;
             overflow: hidden;
             background: #0f172a;
         }
         canvas {
             display: block;
-            background: linear-gradient(135deg, #1e293b, #0f172a);
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, #1e293b 0%, #020617 100%);
         }
         .screen {
             position: absolute;
@@ -48,59 +53,153 @@ HTML
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            background: rgba(2, 6, 23, 0.92);
+            background: rgba(2, 6, 23, 0.95);
             z-index: 10;
-            transition: opacity 0.3s ease;
+            padding: 18px;
+            text-align: center;
         }
         .hidden {
             display: none !important;
         }
-        h1 {
-            font-size: 3rem;
-            margin-bottom: 20px;
-            background: linear-gradient(to right, #38bdf8, #818cf8);
+        .top-back-btn {
+            position: absolute;
+            top: 12px;
+            left: 14px;
+            background: rgba(30, 41, 59, 0.92);
+            color: #f8fafc;
+            border: 1.5px solid #475569;
+            padding: 7px 14px;
+            font-size: 0.85rem;
+            font-weight: 800;
+            border-radius: 8px;
+            cursor: pointer;
+            z-index: 25;
+            transition: all 0.15s;
+        }
+        .top-back-btn:hover {
+            background: #334155;
+            border-color: #facc15;
+            color: #facc15;
+        }
+        .logo-title {
+            font-size: clamp(1.6rem, 3.8vw, 3rem);
+            font-weight: 900;
+            letter-spacing: 2px;
+            margin-bottom: 8px;
+            background: linear-gradient(to right, #facc15, #f97316, #ef4444);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            text-shadow: 0 2px 10px rgba(56, 189, 248, 0.3);
+            text-shadow: 0 4px 20px rgba(249, 115, 22, 0.45);
+        }
+        .subtitle {
+            color: #94a3b8;
+            font-size: clamp(0.78rem, 1.35vw, 1rem);
+            margin-bottom: 18px;
         }
         .btn {
             background: linear-gradient(135deg, #2563eb, #1d4ed8);
             color: white;
-            border: none;
-            padding: 12px 30px;
-            font-size: 1.2rem;
-            border-radius: 8px;
+            border: 1px solid #3b82f6;
+            padding: 11px 28px;
+            font-size: clamp(0.9rem, 1.6vw, 1.08rem);
+            font-weight: 800;
+            border-radius: 9px;
             cursor: pointer;
-            margin: 8px;
-            transition: transform 0.1s, box-shadow 0.1s;
-            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+            margin: 6px;
+            transition: transform 0.1s, box-shadow 0.15s;
+            box-shadow: 0 4px 14px rgba(37, 99, 235, 0.45);
         }
         .btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(37, 99, 235, 0.6);
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.7);
         }
         .btn:active {
             transform: translateY(1px);
         }
+        .btn-tournament {
+            background: linear-gradient(135deg, #d97706, #b45309);
+            border-color: #f59e0b;
+            box-shadow: 0 4px 14px rgba(217, 119, 6, 0.45);
+        }
+        .btn-secondary {
+            background: #334155;
+            border-color: #475569;
+            box-shadow: none;
+        }
+        /* Chiroyli Qahramonlar Menyusi */
         .char-grid {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
             gap: 10px;
-            margin-bottom: 20px;
+            width: 100%;
+            max-width: 780px;
+            margin-top: 8px;
         }
         .char-card {
-            background: #1e293b;
+            background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
             border: 2px solid #334155;
-            padding: 10px;
-            border-radius: 8px;
+            padding: 8px 6px 10px;
+            border-radius: 12px;
             cursor: pointer;
-            text-align: center;
-            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: all 0.18s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
         }
-        .char-card:hover, .char-card.selected {
-            border-color: #38bdf8;
-            background: #334155;
-            transform: scale(1.05);
+        .char-card:hover {
+            border-color: #facc15;
+            transform: translateY(-4px) scale(1.04);
+            box-shadow: 0 8px 20px rgba(250, 204, 21, 0.35);
+            background: linear-gradient(180deg, #273549 0%, #1e293b 100%);
+        }
+        .char-avatar {
+            width: 64px;
+            height: 64px;
+            border-radius: 10px;
+            background: #020617;
+            border: 1.5px solid #475569;
+            margin-bottom: 6px;
+        }
+        .char-name {
+            font-weight: 900;
+            font-size: clamp(0.78rem, 1.3vw, 0.95rem);
+            letter-spacing: 0.4px;
+        }
+        .char-jutsu {
+            font-size: clamp(0.62rem, 1vw, 0.74rem);
+            color: #94a3b8;
+            margin-top: 2px;
+        }
+        /* Turnir jadvali */
+        .tourney-box {
+            background: #1e293b;
+            border: 1.5px solid #334155;
+            border-radius: 12px;
+            padding: 14px 20px;
+            width: 100%;
+            max-width: 540px;
+            margin-bottom: 14px;
+        }
+        .tourney-stage {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 9px 14px;
+            margin: 6px 0;
+            background: #0f172a;
+            border-radius: 8px;
+            border-left: 4px solid #475569;
+            font-size: 0.92rem;
+        }
+        .tourney-stage.active {
+            border-left-color: #facc15;
+            background: rgba(250, 204, 21, 0.12);
+            font-weight: bold;
+        }
+        .tourney-stage.done {
+            border-left-color: #10b981;
+            color: #94a3b8;
         }
         #hud {
             position: absolute;
@@ -108,254 +207,907 @@ HTML
             left: 0;
             width: 100%;
             display: flex;
-            justify-content: space-between;
-            padding: 0 20px;
-            font-size: 1.5rem;
-            font-weight: bold;
-            pointer-events: none;
+            justify-content: center;
+            gap: 24px;
+            align-items: center;
+            padding: 0 24px;
             z-index: 5;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+            pointer-events: none;
+        }
+        .hud-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: rgba(15, 23, 42, 0.85);
+            padding: 5px 14px;
+            border-radius: 9px;
+            border: 1px solid #334155;
+        }
+        .score-num {
+            font-size: 1.45rem;
+            font-weight: 900;
+        }
+        .chakra-bar {
+            width: 85px;
+            height: 6px;
+            background: #334155;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 3px;
+        }
+        .chakra-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #38bdf8, #facc15);
+            transition: width 0.15s;
+        }
+        #touch-controls {
+            position: absolute;
+            bottom: 10px;
+            left: 0;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            padding: 0 16px;
+            z-index: 6;
+            pointer-events: none;
+        }
+        .touch-group {
+            display: flex;
+            gap: 8px;
+            pointer-events: auto;
+        }
+        .t-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: rgba(30, 41, 59, 0.7);
+            border: 1.5px solid rgba(148, 163, 184, 0.5);
+            color: #fff;
+            font-weight: bold;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            touch-action: manipulation;
+        }
+        .t-btn:active {
+            background: rgba(56, 189, 248, 0.65);
         }
     </style>
 </head>
 <body>
 
-    <div id="game-container">
-        <!-- Bosh sahifa (Splash Screen) -->
-        <div id="main-menu" class="screen">
-            <h1>NINJA SOCCER 2026</h1>
-            <button class="btn" onclick="showModeSelect()">O'yinni Boshlash</button>
-        </div>
-
-        <!-- Rejim tanlash -->
-        <div id="mode-select" class="screen hidden">
-            <h1>Rejimni Tanlang</h1>
-            <button class="btn" onclick="selectMode('bot')">1 Kishi (VS Bot)</button>
-            <button class="btn" onclick="selectMode('2p')">2 Kishilik (Local)</button>
-            <button class="btn" onclick="backToMenu()" style="background: #475569;">Orqaga</button>
-        </div>
-
-        <!-- Qahramon tanlash -->
-        <div id="char-select" class="screen hidden">
-            <h1 id="char-title">1-O'yinchi: Qahramon Tanlang</h1>
-            <div class="char-grid" id="char-grid"></div>
-        </div>
-
-        <!-- O'yin interfeysi (HUD) -->
-        <div id="hud" class="hidden">
-            <div id="score-1" style="color: #38bdf8;">0</div>
-            <div id="timer" style="color: #e2e8f0;">03:00</div>
-            <div id="score-2" style="color: #f43f5e;">0</div>
-        </div>
-
-        <!-- Asosiy Canvas maydoni -->
-        <canvas id="gameCanvas" width="800" height="450" class="hidden"></canvas>
+<div id="game-container">
+    <!-- 2 soniyalik Splash Screen -->
+    <div id="splash-screen" class="screen" onclick="skipSplash()" style="cursor: pointer;">
+        <div class="logo-title">NINJA SOCCER 2026</div>
+        <div class="subtitle">HEAD SOCCER SHINOBI EDITION</div>
+        <div style="font-size: 0.75rem; color: #64748b; margin-top: 10px;">Yuklanmoqda... (O'tkazish uchun bosing)</div>
     </div>
 
-    <script>
-        const canvas = document.getElementById('gameCanvas');
-        const ctx = canvas.getContext('2d');
+    <!-- Main Menu -->
+    <div id="main-menu" class="screen hidden">
+        <div class="logo-title">NINJA SOCCER 2026</div>
+        <div class="subtitle">1P: W A S D + Q (Zarba) + E (Jutsu) | 2P: I J K L + U (Zarba) + O (Jutsu)</div>
+        <button class="btn" onclick="showModeSelect()">O'YINNI BOSHLASH</button>
+    </div>
 
-        let gameState = 'MENU';
-        let gameMode = 'bot';
-        let p1Selection = null;
-        let p2Selection = null;
-        let selectingPlayer = 1;
+    <!-- Mode Select -->
+    <div id="mode-select" class="screen hidden">
+        <button class="top-back-btn" onclick="backToMenu()">◀ ORQAGA</button>
+        <div class="logo-title" style="font-size: 2.1rem;">REJIMNI TANLANG</div>
+        <button class="btn" onclick="selectMode('bot')">1 KISHI (VS BOT)</button>
+        <button class="btn" onclick="selectMode('2p')">2 KISHILIK (2 PLAYER)</button>
+        <button class="btn btn-tournament" onclick="selectMode('tournament')">🏆 TURNIR (KUBOK)</button>
+    </div>
 
-        const characters = [
-            { name: 'Naruto', color: '#f97316', jutsu: 'Rasengan' },
-            { name: 'Sasuke', color: '#6366f1', jutsu: 'Chidori' },
-            { name: 'Kakashi', color: '#94a3b8', jutsu: 'Lightning Blade' },
-            { name: 'Madara', color: '#ef4444', jutsu: 'Susanoo' },
-            { name: 'Itachi', color: '#dc2626', jutsu: 'Amaterasu' },
-            { name: 'Hashirama', color: '#10b981', jutsu: 'Wood Golem' },
-            { name: 'Minato', color: '#eab308', jutsu: 'Flying Raijin' },
-            { name: 'Pain', color: '#8b5cf6', jutsu: 'Almighty Push' },
-            { name: 'Obito', color: '#334155', jutsu: 'Kamui' },
-            { name: 'Might Guy', color: '#16a34a', jutsu: 'Night Guy' }
-        ];
+    <!-- Character Select -->
+    <div id="char-select" class="screen hidden">
+        <button class="top-back-btn" onclick="backToMode()">◀ ORQAGA</button>
+        <div id="char-title" class="logo-title" style="font-size: 1.55rem; margin-top: 14px;">1-O'YINCHI: QAHRAMON TANLANG</div>
+        <div class="char-grid" id="char-grid"></div>
+    </div>
 
-        let p1 = { x: 100, y: 320, vx: 0, vy: 0, width: 40, height: 70, color: '#f97316', score: 0, grounded: false };
-        let p2 = { x: 660, y: 320, vx: 0, vy: 0, width: 40, height: 70, color: '#6366f1', score: 0, grounded: false };
-        let ball = { x: 400, y: 200, vx: 0, vy: 0, radius: 12 };
+    <!-- Tournament Bracket Screen -->
+    <div id="tournament-screen" class="screen hidden">
+        <button class="top-back-btn" onclick="goHome()">◀ MENYU</button>
+        <div class="logo-title" style="font-size: 1.9rem;">SHINOBI KUBOGI - TURNIR</div>
+        <div class="tourney-box" id="tourney-bracket"></div>
+        <button class="btn btn-tournament" onclick="startTournamentMatch()">O'YINNI BOSHLASH</button>
+    </div>
 
-        let keys = {};
+    <!-- Game Over -->
+    <div id="gameover-screen" class="screen hidden">
+        <button class="top-back-btn" onclick="goHome()">◀ MENYU</button>
+        <div id="winner-text" class="logo-title">G'OLIB!</div>
+        <div id="final-score" class="subtitle" style="font-size: 1.4rem; color: #fff;">0 - 0</div>
+        <div id="gameover-actions">
+            <button class="btn" onclick="restartGame()">QAYTA O'YNASH</button>
+            <button class="btn btn-secondary" onclick="goHome()">BOSH MENYU</button>
+        </div>
+    </div>
 
-        window.addEventListener('keydown', e => keys[e.code] = true);
-        window.addEventListener('keyup', e => keys[e.code] = false);
+    <!-- Top Back Button inside Match -->
+    <button id="match-back-btn" class="top-back-btn hidden" onclick="exitMatchToMenu()">◀ CHIQISH</button>
 
-        function showModeSelect() {
-            document.getElementById('main-menu').classList.add('hidden');
-            document.getElementById('mode-select').classList.remove('hidden');
-        }
+    <!-- HUD -->
+    <div id="hud" class="hidden">
+        <div class="hud-box">
+            <div id="p1-name" style="font-size: 0.72rem; color: #94a3b8;">P1</div>
+            <div id="score-1" class="score-num" style="color: #38bdf8;">0</div>
+            <div class="chakra-bar"><div id="chakra-1" class="chakra-fill"></div></div>
+        </div>
+        <div class="hud-box">
+            <div id="stage-label" style="font-size: 0.68rem; color: #facc15;">VAQT</div>
+            <div id="timer" class="score-num" style="color: #fff;">02:00</div>
+        </div>
+        <div class="hud-box">
+            <div id="p2-name" style="font-size: 0.72rem; color: #94a3b8;">P2</div>
+            <div id="score-2" class="score-num" style="color: #f43f5e;">0</div>
+            <div class="chakra-bar"><div id="chakra-2" class="chakra-fill"></div></div>
+        </div>
+    </div>
 
-        function backToMenu() {
-            document.getElementById('mode-select').classList.add('hidden');
+    <!-- Mobile Touch Controls -->
+    <div id="touch-controls" class="hidden">
+        <div class="touch-group">
+            <button class="t-btn" data-key="KeyA">◀</button>
+            <button class="t-btn" data-key="KeyD">▶</button>
+            <button class="t-btn" data-key="KeyW">▲</button>
+            <button class="t-btn" data-key="KeyQ" style="border-color:#38bdf8;">⚡</button>
+            <button class="t-btn" data-key="KeyE" style="border-color:#facc15;">🔥</button>
+        </div>
+        <div class="touch-group" id="p2-touch">
+            <button class="t-btn" data-key="KeyU" style="border-color:#f43f5e;">⚡</button>
+            <button class="t-btn" data-key="KeyO" style="border-color:#facc15;">🔥</button>
+            <button class="t-btn" data-key="KeyI">▲</button>
+            <button class="t-btn" data-key="KeyJ">◀</button>
+            <button class="t-btn" data-key="KeyL">▶</button>
+        </div>
+    </div>
+
+    <canvas id="gameCanvas" width="900" height="506"></canvas>
+</div>
+
+<script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+
+    const characters = [
+        { name: 'Naruto', suit: '#f97316', trim: '#1e293b', hair: '#facc15', hairStyle: 'spiky', eyes: '#38bdf8', skin: '#fed7aa', marks: true, jutsu: 'Rasengan' },
+        { name: 'Sasuke', suit: '#4f46e5', trim: '#e2e8f0', hair: '#0f172a', hairStyle: 'duckbutt', eyes: '#ef4444', skin: '#ffedd5', marks: false, jutsu: 'Chidori' },
+        { name: 'Kakashi', suit: '#15803d', trim: '#1e293b', hair: '#e2e8f0', hairStyle: 'side', eyes: '#0f172a', skin: '#fed7aa', mask: true, jutsu: 'Raikiri' },
+        { name: 'Madara', suit: '#b91c1c', trim: '#090d16', hair: '#090d16', hairStyle: 'long', eyes: '#ef4444', skin: '#fed7aa', marks: false, jutsu: 'Susanoo' },
+        { name: 'Itachi', suit: '#090d16', trim: '#dc2626', hair: '#090d16', hairStyle: 'ponytail', eyes: '#ef4444', skin: '#ffedd5', lines: true, jutsu: 'Amaterasu' },
+        { name: 'Hashirama', suit: '#991b1b', trim: '#1c1917', hair: '#1c1917', hairStyle: 'long', eyes: '#0f172a', skin: '#fdba74', marks: false, jutsu: 'Wood Dragon' },
+        { name: 'Minato', suit: '#1e3a8a', trim: '#f8fafc', hair: '#fef08a', hairStyle: 'spiky', eyes: '#38bdf8', skin: '#fed7aa', marks: false, jutsu: 'Flying Raijin' },
+        { name: 'Pain', suit: '#090d16', trim: '#dc2626', hair: '#f97316', hairStyle: 'spiky', eyes: '#c084fc', skin: '#fed7aa', piercings: true, jutsu: 'Shinra Tensei' },
+        { name: 'Obito', suit: '#1e293b', trim: '#f97316', hair: '#0f172a', hairStyle: 'short', eyes: '#ef4444', skin: '#fed7aa', goggles: true, jutsu: 'Kamui' },
+        { name: 'Might Guy', suit: '#16a34a', trim: '#f97316', hair: '#090d16', hairStyle: 'bowl', eyes: '#0f172a', skin: '#fdba74', brows: true, jutsu: 'Night Guy' }
+    ];
+
+    let gameState = 'SPLASH';
+    let gameMode = 'bot';
+    let selectingPlayer = 1;
+    let p1Char = characters[0];
+    let p2Char = characters[1];
+    let timeLeft = 120;
+    let timerInterval = null;
+    let animFrameId = null;
+    let particles = [];
+    let keys = {};
+
+    let tourneyRound = 0;
+    let tourneyOpponents = [];
+    const roundNames = ['1/4 FINAL (CHORAK)', '1/2 FINAL (YARIM)', 'FINAL (KUBOK UCHUN)'];
+
+    const groundY = 435;
+    const goalTop = 275;
+
+    let p1 = { x: 160, y: 345, vx: 0, vy: 0, w: 54, h: 90, dir: 1, score: 0, chakra: 0, grounded: false, kickAnim: 0, superActive: 0 };
+    let p2 = { x: 685, y: 345, vx: 0, vy: 0, w: 54, h: 90, dir: -1, score: 0, chakra: 0, grounded: false, kickAnim: 0, superActive: 0 };
+    let ball = { x: 450, y: 200, vx: 0, vy: 0, r: 15, superGlow: null };
+
+    function skipSplash() {
+        if (gameState === 'SPLASH') {
+            document.getElementById('splash-screen').classList.add('hidden');
             document.getElementById('main-menu').classList.remove('hidden');
+            gameState = 'MENU';
+        }
+    }
+
+    setTimeout(skipSplash, 2000);
+
+    window.addEventListener('keydown', e => {
+        keys[e.code] = true;
+        if (gameState === 'PLAYING') {
+            if (e.code === 'KeyQ') kickBall(p1, 1);
+            if (e.code === 'KeyE') triggerSuper(p1, p1Char, 1);
+            if (gameMode === '2p') {
+                if (e.code === 'KeyU') kickBall(p2, -1);
+                if (e.code === 'KeyO') triggerSuper(p2, p2Char, -1);
+            }
+        }
+    });
+    window.addEventListener('keyup', e => keys[e.code] = false);
+
+    document.querySelectorAll('.t-btn').forEach(btn => {
+        const code = btn.getAttribute('data-key');
+        const press = (e) => {
+            e.preventDefault();
+            keys[code] = true;
+            if (gameState === 'PLAYING') {
+                if (code === 'KeyQ') kickBall(p1, 1);
+                if (code === 'KeyE') triggerSuper(p1, p1Char, 1);
+                if (code === 'KeyU') kickBall(p2, -1);
+                if (code === 'KeyO') triggerSuper(p2, p2Char, -1);
+            }
+        };
+        const release = (e) => {
+            e.preventDefault();
+            keys[code] = false;
+        };
+        btn.addEventListener('touchstart', press, { passive: false });
+        btn.addEventListener('touchend', release, { passive: false });
+        btn.addEventListener('mousedown', press);
+        btn.addEventListener('mouseup', release);
+    });
+
+    function showModeSelect() {
+        document.getElementById('main-menu').classList.add('hidden');
+        document.getElementById('mode-select').classList.remove('hidden');
+    }
+
+    function backToMenu() {
+        document.getElementById('mode-select').classList.add('hidden');
+        document.getElementById('main-menu').classList.remove('hidden');
+    }
+
+    function backToMode() {
+        document.getElementById('char-select').classList.add('hidden');
+        document.getElementById('mode-select').classList.remove('hidden');
+    }
+
+    function selectMode(mode) {
+        gameMode = mode;
+        selectingPlayer = 1;
+        document.getElementById('char-title').innerText = "1-O'YINCHI: QAHRAMON TANLANG";
+        document.getElementById('mode-select').classList.add('hidden');
+        document.getElementById('char-select').classList.remove('hidden');
+        renderCharGrid();
+    }
+
+    function drawPortrait(cCtx, charObj) {
+        cCtx.clearRect(0, 0, 64, 64);
+        const grad = cCtx.createRadialGradient(32, 32, 4, 32, 32, 32);
+        grad.addColorStop(0, charObj.suit);
+        grad.addColorStop(1, '#090d16');
+        cCtx.fillStyle = grad;
+        cCtx.fillRect(0, 0, 64, 64);
+
+        cCtx.fillStyle = charObj.skin;
+        cCtx.fillRect(14, 18, 36, 36);
+        cCtx.strokeStyle = '#0f172a';
+        cCtx.lineWidth = 2;
+        cCtx.strokeRect(14, 18, 36, 36);
+
+        cCtx.fillStyle = '#1e293b';
+        cCtx.fillRect(14, 22, 36, 8);
+        cCtx.fillStyle = '#cbd5e1';
+        cCtx.fillRect(23, 23, 18, 6);
+
+        cCtx.fillStyle = charObj.hair;
+        cCtx.fillRect(11, 10, 42, 12);
+        if (charObj.hairStyle === 'spiky') {
+            cCtx.beginPath();
+            cCtx.moveTo(14, 10); cCtx.lineTo(22, 2); cCtx.lineTo(30, 10);
+            cCtx.lineTo(36, 1); cCtx.lineTo(44, 10); cCtx.lineTo(50, 4); cCtx.lineTo(52, 12);
+            cCtx.fill();
+        } else if (charObj.hairStyle === 'long' || charObj.hairStyle === 'ponytail') {
+            cCtx.fillRect(10, 18, 5, 34);
+            cCtx.fillRect(49, 18, 5, 34);
         }
 
-        function selectMode(mode) {
-            gameMode = mode;
-            document.getElementById('mode-select').classList.add('hidden');
-            document.getElementById('char-select').classList.remove('hidden');
-            buildCharGrid();
+        if (charObj.goggles) {
+            cCtx.fillStyle = '#f97316';
+            cCtx.fillRect(16, 14, 32, 8);
+            cCtx.fillStyle = '#38bdf8';
+            cCtx.fillRect(19, 15, 10, 6);
+            cCtx.fillRect(35, 15, 10, 6);
         }
 
-        function buildCharGrid() {
-            const grid = document.getElementById('char-grid');
-            grid.innerHTML = '';
-            characters.forEach((char, index) => {
-                const card = document.createElement('div');
-                card.className = 'char-card';
-                card.innerHTML = `<b style="color:${char.color}">${char.name}</b><br><small>${char.jutsu}</small>`;
-                card.onclick = () => chooseCharacter(index);
-                grid.appendChild(card);
+        cCtx.fillStyle = charObj.eyes;
+        cCtx.fillRect(21, 35, 6, 5);
+        cCtx.fillRect(37, 35, 6, 5);
+
+        if (charObj.brows) {
+            cCtx.fillStyle = '#090d16';
+            cCtx.fillRect(19, 31, 10, 3);
+            cCtx.fillRect(35, 31, 10, 3);
+        }
+        if (charObj.marks) {
+            cCtx.fillStyle = '#9a3412';
+            cCtx.fillRect(16, 41, 5, 1.5); cCtx.fillRect(16, 44, 5, 1.5);
+            cCtx.fillRect(43, 41, 5, 1.5); cCtx.fillRect(43, 44, 5, 1.5);
+        }
+        if (charObj.mask) {
+            cCtx.fillStyle = '#1e293b';
+            cCtx.fillRect(14, 41, 36, 13);
+        }
+        if (charObj.piercings) {
+            cCtx.fillStyle = '#f97316';
+            cCtx.fillRect(31, 42, 2, 2);
+            cCtx.fillRect(22, 47, 2, 2);
+            cCtx.fillRect(40, 47, 2, 2);
+        }
+    }
+
+    function renderCharGrid() {
+        const grid = document.getElementById('char-grid');
+        grid.innerHTML = '';
+        characters.forEach((c, idx) => {
+            const card = document.createElement('div');
+            card.className = 'char-card';
+
+            const avatarCanvas = document.createElement('canvas');
+            avatarCanvas.width = 64;
+            avatarCanvas.height = 64;
+            avatarCanvas.className = 'char-avatar';
+            drawPortrait(avatarCanvas.getContext('2d'), c);
+
+            const nameDiv = document.createElement('div');
+            nameDiv.className = 'char-name';
+            nameDiv.style.color = c.suit === '#090d16' ? '#f87171' : c.suit;
+            nameDiv.innerText = c.name;
+
+            const jutsuDiv = document.createElement('div');
+            jutsuDiv.className = 'char-jutsu';
+            jutsuDiv.innerText = c.jutsu;
+
+            card.appendChild(avatarCanvas);
+            card.appendChild(nameDiv);
+            card.appendChild(jutsuDiv);
+            card.onclick = () => pickCharacter(idx);
+            grid.appendChild(card);
+        });
+    }
+
+    function pickCharacter(idx) {
+        if (selectingPlayer === 1) {
+            p1Char = characters[idx];
+            if (gameMode === 'bot') {
+                let botIdx = Math.floor(Math.random() * characters.length);
+                if (botIdx === idx) botIdx = (idx + 1) % characters.length;
+                p2Char = characters[botIdx];
+                startMatch();
+            } else if (gameMode === 'tournament') {
+                setupTournament(idx);
+            } else {
+                selectingPlayer = 2;
+                document.getElementById('char-title').innerText = "2-O'YINCHI: QAHRAMON TANLANG";
+            }
+        } else {
+            p2Char = characters[idx];
+            startMatch();
+        }
+    }
+
+    function setupTournament(playerIdx) {
+        tourneyRound = 0;
+        const pool = characters.filter((_, i) => i !== playerIdx);
+        pool.sort(() => Math.random() - 0.5);
+        tourneyOpponents = pool.slice(0, 3);
+        showTournamentBracket();
+    }
+
+    function showTournamentBracket() {
+        document.getElementById('char-select').classList.add('hidden');
+        document.getElementById('gameover-screen').classList.add('hidden');
+        document.getElementById('tournament-screen').classList.remove('hidden');
+
+        const box = document.getElementById('tourney-bracket');
+        box.innerHTML = '';
+        roundNames.forEach((rName, i) => {
+            const opp = tourneyOpponents[i];
+            let cls = 'tourney-stage';
+            let status = 'KUTILMOQDA';
+            if (i < tourneyRound) {
+                cls += ' done';
+                status = "G'ALABA ✔";
+            } else if (i === tourneyRound) {
+                cls += ' active';
+                status = 'NAVBATDAGI';
+            }
+            box.innerHTML += `
+                <div class="${cls}">
+                    <span>${rName}: <b style="color:#38bdf8">${p1Char.name}</b> vs <b style="color:#f43f5e">${opp.name}</b></span>
+                    <span>${status}</span>
+                </div>
+            `;
+        });
+    }
+
+    function startTournamentMatch() {
+        document.getElementById('tournament-screen').classList.add('hidden');
+        p2Char = tourneyOpponents[tourneyRound];
+        startMatch();
+    }
+
+    function startMatch() {
+        document.getElementById('char-select').classList.add('hidden');
+        document.getElementById('gameover-screen').classList.add('hidden');
+        document.getElementById('hud').classList.remove('hidden');
+        document.getElementById('match-back-btn').classList.remove('hidden');
+        document.getElementById('touch-controls').classList.remove('hidden');
+        document.getElementById('p2-touch').style.display = gameMode === '2p' ? 'flex' : 'none';
+
+        document.getElementById('p1-name').innerText = p1Char.name.toUpperCase();
+        document.getElementById('p2-name').innerText = gameMode === '2p' ? p2Char.name.toUpperCase() : p2Char.name.toUpperCase() + ' (BOT)';
+        document.getElementById('stage-label').innerText = gameMode === 'tournament' ? roundNames[tourneyRound] : 'VAQT';
+
+        p1.score = 0; p2.score = 0;
+        p1.chakra = 0; p2.chakra = 0;
+        timeLeft = 120;
+        updateHUD();
+        resetPositions();
+
+        gameState = 'PLAYING';
+        clearInterval(timerInterval);
+        timerInterval = setInterval(() => {
+            if (gameState !== 'PLAYING') return;
+            timeLeft--;
+            updateHUD();
+            if (timeLeft <= 0) endMatch();
+        }, 1000);
+
+        cancelAnimationFrame(animFrameId);
+        animFrameId = requestAnimationFrame(gameLoop);
+    }
+
+    function exitMatchToMenu() {
+        gameState = 'MENU';
+        clearInterval(timerInterval);
+        cancelAnimationFrame(animFrameId);
+        document.getElementById('hud').classList.add('hidden');
+        document.getElementById('match-back-btn').classList.add('hidden');
+        document.getElementById('touch-controls').classList.add('hidden');
+        document.getElementById('mode-select').classList.remove('hidden');
+    }
+
+    function resetPositions() {
+        p1.x = 175; p1.y = groundY - p1.h; p1.vx = 0; p1.vy = 0;
+        p2.x = 670; p2.y = groundY - p2.h; p2.vx = 0; p2.vy = 0;
+        ball.x = 450; ball.y = 180; ball.vx = 0; ball.vy = 0; ball.superGlow = null;
+    }
+
+    function updateHUD() {
+        document.getElementById('score-1').innerText = p1.score;
+        document.getElementById('score-2').innerText = p2.score;
+        document.getElementById('chakra-1').style.width = p1.chakra + '%';
+        document.getElementById('chakra-2').style.width = p2.chakra + '%';
+        const mins = String(Math.floor(timeLeft / 60)).padStart(2, '0');
+        const secs = String(timeLeft % 60).padStart(2, '0');
+        document.getElementById('timer').innerText = `${mins}:${secs}`;
+    }
+
+    function createExplosion(x, y, color, count = 18) {
+        for (let i = 0; i < count; i++) {
+            const angle = Math.random() * Math.PI * 2;
+            const speed = 2 + Math.random() * 6;
+            particles.push({
+                x, y,
+                vx: Math.cos(angle) * speed,
+                vy: Math.sin(angle) * speed,
+                life: 25 + Math.random() * 15,
+                color
             });
         }
+    }
 
-        function chooseCharacter(index) {
-            if (selectingPlayer === 1) {
-                p1Selection = characters[index];
-                p1.color = p1Selection.color;
-                selectingPlayer = 2;
-                if (gameMode === 'bot') {
-                    let botIndex = Math.floor(Math.random() * characters.length);
-                    p2Selection = characters[botIndex];
-                    p2.color = p2Selection.color;
-                    startGame();
-                } else {
-                    document.getElementById('char-title').innerText = "2-O'yinchi: Qahramon Tanlang";
-                }
-            } else {
-                p2Selection = characters[index];
-                p2.color = p2Selection.color;
-                startGame();
+    function kickBall(player, dir) {
+        player.kickAnim = 12;
+        const footX = dir === 1 ? player.x + player.w + 8 : player.x - 8;
+        const footY = player.y + player.h - 14;
+        const dist = Math.hypot(ball.x - footX, ball.y - footY);
+        if (dist < 62) {
+            ball.vx = dir * 13.5 + player.vx * 0.4;
+            ball.vy = -7.2;
+            player.chakra = Math.min(100, player.chakra + 20);
+            createExplosion(ball.x, ball.y, '#38bdf8', 12);
+            updateHUD();
+        }
+    }
+
+    function triggerSuper(player, charObj, dir) {
+        if (player.chakra < 100) return;
+        const dx = ball.x - (player.x + player.w / 2);
+        const dy = ball.y - (player.y + player.h / 2);
+        if (Math.hypot(dx, dy) < 125) {
+            player.chakra = 0;
+            player.superActive = 30;
+            player.kickAnim = 16;
+            ball.vx = dir * 21;
+            ball.vy = -3.8;
+            ball.superGlow = charObj.suit === '#090d16' ? '#ef4444' : charObj.suit;
+            createExplosion(ball.x, ball.y, ball.superGlow, 35);
+            updateHUD();
+        }
+    }
+
+    function update() {
+        if (gameState !== 'PLAYING') return;
+
+        if (keys['KeyA']) { p1.vx = -6; p1.dir = -1; }
+        else if (keys['KeyD']) { p1.vx = 6; p1.dir = 1; }
+        else p1.vx = 0;
+
+        if (keys['KeyW'] && p1.grounded) {
+            p1.vy = -13.5;
+            p1.grounded = false;
+        }
+
+        if (gameMode === '2p') {
+            if (keys['KeyJ'] || keys['ArrowLeft']) { p2.vx = -6; p2.dir = -1; }
+            else if (keys['KeyL'] || keys['ArrowRight']) { p2.vx = 6; p2.dir = 1; }
+            else p2.vx = 0;
+
+            if ((keys['KeyI'] || keys['ArrowUp']) && p2.grounded) {
+                p2.vy = -13.5;
+                p2.grounded = false;
+            }
+        } else {
+            updateSmartBot();
+        }
+
+        [p1, p2].forEach(p => {
+            p.vy += 0.65;
+            p.x += p.vx;
+            p.y += p.vy;
+            if (p.superActive > 0) p.superActive--;
+            if (p.kickAnim > 0) p.kickAnim--;
+            if (p.y + p.h >= groundY) {
+                p.y = groundY - p.h;
+                p.vy = 0;
+                p.grounded = true;
+            }
+            if (p.x < 55) p.x = 55;
+            if (p.x + p.w > 845) p.x = 845 - p.w;
+        });
+
+        ball.vy += 0.42;
+        ball.x += ball.vx;
+        ball.y += ball.vy;
+
+        if (ball.y + ball.r >= groundY) {
+            ball.y = groundY - ball.r;
+            ball.vy *= -0.76;
+            ball.vx *= 0.96;
+            if (Math.abs(ball.vy) < 1.5) ball.vy = 0;
+        }
+        if (ball.y - ball.r < 20) {
+            ball.y = 20 + ball.r;
+            ball.vy *= -0.7;
+        }
+
+        if (ball.y > goalTop - 10 && ball.y < goalTop + 10) {
+            if (ball.x - ball.r < 60 || ball.x + ball.r > 840) {
+                ball.vy *= -0.9;
+                ball.vx *= -0.8;
             }
         }
 
-        function startGame() {
-            document.getElementById('char-select').classList.add('hidden');
-            document.getElementById('hud').classList.remove('hidden');
-            document.getElementById('gameCanvas').classList.remove('hidden');
-            gameState = 'PLAYING';
-            resetPositions();
-            requestAnimationFrame(gameLoop);
-        }
-
-        function resetPositions() {
-            p1.x = 150; p1.y = 320; p1.vx = 0; p1.vy = 0;
-            p2.x = 610; p2.y = 320; p2.vx = 0; p2.vy = 0;
-            ball.x = 400; ball.y = 200; ball.vx = 0; ball.vy = 0;
-        }
-
-        function update() {
-            if (gameState !== 'PLAYING') return;
-
-            if (keys['KeyA']) p1.vx = -5;
-            else if (keys['KeyD']) p1.vx = 5;
-            else p1.vx = 0;
-
-            if (keys['KeyW'] && p1.grounded) {
-                p1.vy = -12;
-                p1.grounded = false;
-            }
-
-            if (gameMode === '2p') {
-                if (keys['ArrowLeft']) p2.vx = -5;
-                else if (keys['ArrowRight']) p2.vx = 5;
-                else p2.vx = 0;
-
-                if (keys['ArrowUp'] && p2.grounded) {
-                    p2.vy = -12;
-                    p2.grounded = false;
-                }
-            } else {
-                if (ball.x > p2.x + 20) p2.vx = 3.5;
-                else if (ball.x < p2.x - 20) p2.vx = -3.5;
-                else p2.vx = 0;
-
-                if (ball.y < p2.y && p2.grounded && Math.random() < 0.05) {
-                    p2.vy = -12;
-                    p2.grounded = false;
-                }
-            }
-
-            p1.vy += 0.5;
-            p2.vy += 0.5;
-
-            p1.x += p1.vx; p1.y += p1.vy;
-            p2.x += p2.vx; p2.y += p2.vy;
-
-            if (p1.y > 320) { p1.y = 320; p1.vy = 0; p1.grounded = true; }
-            if (p2.y > 320) { p2.y = 320; p2.vy = 0; p2.grounded = true; }
-
-            if (p1.x < 20) p1.x = 20;
-            if (p1.x > 360) p1.x = 360;
-            if (p2.x < 400) p2.x = 400;
-            if (p2.x > 740) p2.x = 740;
-
-            ball.vy += 0.35;
-            ball.x += ball.vx;
-            ball.y += ball.vy;
-
-            if (ball.y > 390) { ball.y = 390; ball.vy *= -0.75; ball.vx *= 0.95; }
-            if (ball.x < 15) { ball.x = 15; ball.vx *= -0.8; }
-            if (ball.x > 785) { ball.x = 785; ball.vx *= -0.8; }
-
-            if (ball.y > 250 && ball.x < 50) {
-                document.getElementById('score-2').innerText = ++p2.score;
+        if (ball.x - ball.r < 55) {
+            if (ball.y > goalTop) {
+                p2.score++;
+                p1.chakra = Math.min(100, p1.chakra + 35);
+                createExplosion(60, ball.y, '#f43f5e', 40);
+                updateHUD();
                 resetPositions();
-            } else if (ball.y > 250 && ball.x > 750) {
-                document.getElementById('score-1').innerText = ++p1.score;
+            } else {
+                ball.x = 55 + ball.r;
+                ball.vx *= -0.8;
+            }
+        }
+        if (ball.x + ball.r > 845) {
+            if (ball.y > goalTop) {
+                p1.score++;
+                p2.chakra = Math.min(100, p2.chakra + 35);
+                createExplosion(840, ball.y, '#38bdf8', 40);
+                updateHUD();
                 resetPositions();
-            }
-
-            checkPlayerBallCollision(p1);
-            checkPlayerBallCollision(p2);
-        }
-
-        function checkPlayerBallCollision(p) {
-            let dx = ball.x - (p.x + p.width / 2);
-            let dy = ball.y - (p.y + p.height / 2);
-            let dist = Math.sqrt(dx * dx + dy * dy);
-            if (dist < ball.radius + p.width / 2) {
-                ball.vx = dx * 0.3 + p.vx * 0.5;
-                ball.vy = dy * 0.3 + p.vy * 0.5;
+            } else {
+                ball.x = 845 - ball.r;
+                ball.vx *= -0.8;
             }
         }
 
-        function draw() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        collidePlayerBall(p1);
+        collidePlayerBall(p2);
 
-            ctx.strokeStyle = '#334155';
-            ctx.lineWidth = 4;
-            ctx.strokeRect(20, 200, 60, 200);
-            ctx.strokeRect(720, 200, 60, 200);
+        particles.forEach(pt => {
+            pt.x += pt.vx;
+            pt.y += pt.vy;
+            pt.life--;
+        });
+        particles = particles.filter(pt => pt.life > 0);
+    }
 
+    function updateSmartBot() {
+        const speed = gameMode === 'tournament' ? (4.4 + tourneyRound * 0.45) : 4.7;
+        const botCenter = p2.x + p2.w / 2;
+
+        let desiredX = 680;
+        if (ball.x > 330) {
+            desiredX = Math.min(815, ball.x + 28);
+        } else {
+            desiredX = 690;
+        }
+
+        const diffX = desiredX - botCenter;
+        if (Math.abs(diffX) > 14) {
+            p2.vx = diffX > 0 ? speed : -speed;
+            p2.dir = diffX > 0 ? 1 : -1;
+        } else {
+            p2.vx = 0;
+            p2.dir = -1;
+        }
+
+        const distToBallX = Math.abs(ball.x - botCenter);
+        if (p2.grounded && distToBallX < 65 && ball.y < p2.y + 10 && ball.y > p2.y - 120) {
+            p2.vy = -13.2;
+            p2.grounded = false;
+        }
+
+        const footX = p2.x - 6;
+        const footY = p2.y + p2.h - 14;
+        const distFoot = Math.hypot(ball.x - footX, ball.y - footY);
+        if (distFoot < 58 && ball.x <= botCenter + 10 && p2.kickAnim === 0) {
+            if (p2.chakra >= 100) {
+                triggerSuper(p2, p2Char, -1);
+            } else {
+                kickBall(p2, -1);
+            }
+        }
+    }
+
+    function collidePlayerBall(p) {
+        const headX = p.x + 4;
+        const headY = p.y;
+        const headW = p.w - 8;
+        const headH = 48;
+
+        const closestX = Math.max(headX, Math.min(ball.x, headX + headW));
+        const closestY = Math.max(headY, Math.min(ball.y, headY + headH));
+        const dx = ball.x - closestX;
+        const dy = ball.y - closestY;
+        const dist = Math.hypot(dx, dy);
+
+        if (dist < ball.r) {
+            const nx = dist > 0 ? dx / dist : p.dir;
+            const ny = dist > 0 ? dy / dist : -1;
+            ball.x = closestX + nx * (ball.r + 1);
+            ball.y = closestY + ny * (ball.r + 1);
+            ball.vx = nx * 8.5 + p.vx * 0.65;
+            ball.vy = ny * 8.5 - 3.2;
+            p.chakra = Math.min(100, p.chakra + 8);
+            updateHUD();
+        }
+    }
+
+    function drawHeadSoccerNinja(p, charObj) {
+        ctx.save();
+        const cx = p.x + p.w / 2;
+
+        ctx.fillStyle = charObj.suit;
+        ctx.fillRect(cx - 13, p.y + 48, 26, 24);
+        ctx.strokeStyle = '#090d16';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(cx - 13, p.y + 48, 26, 24);
+
+        ctx.fillStyle = charObj.trim;
+        ctx.fillRect(cx - 4, p.y + 48, 8, 24);
+
+        ctx.save();
+        ctx.translate(cx, p.y + 72);
+        if (p.kickAnim > 0) {
+            ctx.rotate(p.dir === 1 ? -0.65 : 0.65);
+        }
+        ctx.fillStyle = '#1e293b';
+        ctx.fillRect(-7, 0, 14, 10);
+        ctx.fillStyle = '#f8fafc';
+        const bootX = p.dir === 1 ? -6 : -14;
+        ctx.fillRect(bootX, 8, 20, 10);
+        ctx.strokeRect(bootX, 8, 20, 10);
+        ctx.fillStyle = charObj.suit === '#090d16' ? '#ef4444' : charObj.suit;
+        ctx.fillRect(bootX + 3, 10, 14, 3);
+        ctx.restore();
+
+        const headW = 46;
+        const headH = 48;
+        const headX = cx - headW / 2;
+        const headY = p.y;
+
+        ctx.fillStyle = charObj.skin;
+        ctx.fillRect(headX, headY, headW, headH);
+        ctx.strokeStyle = '#090d16';
+        ctx.lineWidth = 2.5;
+        ctx.strokeRect(headX, headY, headW, headH);
+
+        ctx.fillStyle = '#1e293b';
+        ctx.fillRect(headX, headY + 9, headW, 9);
+        ctx.fillStyle = '#cbd5e1';
+        const plateX = p.dir === 1 ? headX + 20 : headX + 6;
+        ctx.fillRect(plateX, headY + 10, 20, 7);
+
+        ctx.fillStyle = charObj.hair;
+        ctx.fillRect(headX - 3, headY - 8, headW + 6, 17);
+        if (charObj.hairStyle === 'spiky') {
             ctx.beginPath();
-            ctx.moveTo(canvas.width / 2, 0);
-            ctx.lineTo(canvas.width / 2, canvas.height);
-            ctx.stroke();
-
-            ctx.fillStyle = p1.color;
-            ctx.fillRect(p1.x, p1.y, p1.width, p1.height);
-
-            ctx.fillStyle = p2.color;
-            ctx.fillRect(p2.x, p2.y, p2.width, p2.height);
-
-            ctx.fillStyle = '#ffffff';
-            ctx.beginPath();
-            ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+            ctx.moveTo(headX, headY - 8);
+            ctx.lineTo(headX + 10, headY - 18);
+            ctx.lineTo(headX + 20, headY - 8);
+            ctx.lineTo(headX + 28, headY - 19);
+            ctx.lineTo(headX + 38, headY - 8);
+            ctx.lineTo(headX + 46, headY - 15);
+            ctx.lineTo(headX + 46, headY - 6);
             ctx.fill();
+        } else if (charObj.hairStyle === 'long' || charObj.hairStyle === 'ponytail') {
+            const backHairX = p.dir === 1 ? headX - 6 : headX + headW - 2;
+            ctx.fillRect(backHairX, headY, 8, 46);
         }
 
-        function gameLoop() {
-            update();
-            draw();
-            if (gameState === 'PLAYING') {
-                requestAnimationFrame(gameLoop);
-            }
+        if (charObj.goggles) {
+            ctx.fillStyle = '#f97316';
+            ctx.fillRect(headX - 1, headY + 2, headW + 2, 8);
+            ctx.fillStyle = '#38bdf8';
+            ctx.fillRect(p.dir === 1 ? headX + 22 : headX + 8, headY + 3, 14, 6);
         }
-    </script>
+
+        const eyeX = p.dir === 1 ? headX + 30 : headX + 8;
+        ctx.fillStyle = charObj.eyes;
+        ctx.fillRect(eyeX, headY + 24, 8, 6);
+        ctx.fillStyle = '#090d16';
+        ctx.fillRect(eyeX - 1, headY + 21, 10, charObj.brows ? 4 : 2.5);
+
+        if (charObj.marks) {
+            ctx.fillStyle = '#9a3412';
+            const markX = p.dir === 1 ? headX + 16 : headX + 22;
+            ctx.fillRect(markX, headY + 32, 7, 2);
+            ctx.fillRect(markX, headY + 36, 7, 2);
+        }
+
+        if (charObj.mask) {
+            ctx.fillStyle = '#1e293b';
+            ctx.fillRect(headX, headY + 31, headW, 17);
+        } else {
+            ctx.fillStyle = '#090d16';
+            const mouthX = p.dir === 1 ? headX + 28 : headX + 10;
+            ctx.fillRect(mouthX, headY + 40, 8, 2.5);
+        }
+
+        ctx.restore();
+    }
+
+    function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        ctx.fillStyle = '#064e3b';
+        ctx.fillRect(0, groundY, canvas.width, canvas.height - groundY);
+        ctx.fillStyle = '#10b981';
+        ctx.fillRect(0, groundY, canvas.width, 5);
+
+        ctx.strokeStyle = 'rgba(255,255,255,0.12)';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(450, 40);
+        ctx.lineTo(450, groundY);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(450, groundY - 80, 65, 0, Math.PI * 2);
+        ctx.stroke();
+
+        ctx.strokeStyle = '#e2e8f0';
+        ctx.lineWidth = 5;
+        ctx.strokeRect(10, goalTop, 45, groundY - goalTop);
+        ctx.strokeRect(845, goalTop, 45, groundY - goalTop);
+
+        drawHeadSoccerNinja(p1, p1Char);
+        drawHeadSoccerNinja(p2, p2Char);
+
+        ctx.save();
+        if (ball.superGlow) {
+            ctx.shadowBlur = 22;
+            ctx.shadowColor = ball.superGlow;
+        }
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = '#0f172a';
+        ctx.lineWidth = 2.5;
+        ctx.stroke();
+        ctx.fillStyle = '#0f172a';
+        ctx.beginPath();
+        ctx.arc(ball.x, ball.y, 5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+
+        particles.forEach(pt => {
+            ctx.fillStyle = pt.color;
+            ctx.globalAlpha = Math.max(0, pt.life / 35);
+            ctx.fillRect(pt.x, pt.y, 5, 5);
+        });
+        ctx.globalAlpha = 1;
+    }
+
+    function gameLoop() {
+        update();
+        draw();
+        if (gameState === 'PLAYING') animFrameId = requestAnimationFrame(gameLoop);
+    }
+
+    function endMatch() {
+        gameState = 'GAMEOVER';
+        clearInterval(timerInterval);
+        cancelAnimationFrame(animFrameId);
+        document.getElementById('hud').classList.add('hidden');
+        document.getElementById('match-back-btn').classList.add('hidden');
+        document.getElementById('touch-controls').classList.add('hidden');
+        document.getElementById('gameover-screen').classList.remove('hidden');
+
+        const actions = document.getElementById('gameover-actions');
+
+        if (gameMode === 'tournament') {
+            if (p1.score > p2.score) {
+                tourneyRound++;
+                if (tourneyRound >= 3) {
+                    document.getElementById('winner-text').innerText = `🏆 ${p1Char.name.toUpperCase()} CHEMPION!`;
+                    document.getElementById('final-score').innerText = `Final hisobi: ${p1.score} - ${p2.score}`;
+                    actions.innerHTML = `<button class="btn" onclick="goHome()">BOSH MENYU</button>`;
+                } else {
+                    document.getElementById('winner-text').innerText = `KEYINGI BOSQICHGA O'TDINGIZ!`;
+                    document.getElementById('final-score').innerText = `${p1.score} - ${p2.score}`;
+                    actions.innerHTML = `<button class="btn btn-tournament" onclick="showTournamentBracket()">TURNIR JADVALI</button>`;
+                }
+            } else {
+                document.getElementById('winner-text').innerText = p1.score === p2.score ? `DURRANG! QAYTA O'YNANG` : `TURNIRDAN CHIQIB KETDINGIZ`;
+                document.getElementById('final-score').innerText = `${p1.score} - ${p2.score}`;
+                actions.innerHTML = `
+                    <button class="btn" onclick="restartGame()">QAYTA O'YNASH</button>
+                    <button class="btn btn-secondary" onclick="goHome()">BOSH MENYU</button>
+                `;
+            }
+            return;
+        }
+
+        let msg = "DURRANG!";
+        if (p1.score > p2.score) msg = `${p1Char.name.toUpperCase()} G'OLIB!`;
+        else if (p2.score > p1.score) msg = `${p2Char.name.toUpperCase()} G'OLIB!`;
+
+        document.getElementById('winner-text').innerText = msg;
+        document.getElementById('final-score').innerText = `${p1.score} - ${p2.score}`;
+        actions.innerHTML = `
+            <button class="btn" onclick="restartGame()">QAYTA O'YNASH</button>
+            <button class="btn btn-secondary" onclick="goHome()">BOSH MENYU</button>
+        `;
+    }
+
+    function restartGame() {
+        startMatch();
+    }
+
+    function goHome() {
+        gameState = 'MENU';
+        clearInterval(timerInterval);
+        cancelAnimationFrame(animFrameId);
+        document.getElementById('gameover-screen').classList.add('hidden');
+        document.getElementById('tournament-screen').classList.add('hidden');
+        document.getElementById('hud').classList.add('hidden');
+        document.getElementById('match-back-btn').classList.add('hidden');
+        document.getElementById('touch-controls').classList.add('hidden');
+        document.getElementById('main-menu').classList.remove('hidden');
+    }
+</script>
 </body>
 </html>
